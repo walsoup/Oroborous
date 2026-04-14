@@ -1,20 +1,26 @@
 # Oroborous
 
-Full-stack starter stack using:
+Native Expo mobile app paired with a FastAPI backend.
 
-- **Frontend**: Next.js (App Router) + Tailwind CSS
-- **Backend**: FastAPI (Python, async routes with strict type hints)
+## Stack
 
-## Repository structure
+- **Mobile**: Expo + React Native
+- **Backend**: FastAPI (Python)
 
-- `/frontend` — Next.js frontend
-- `/backend` — FastAPI backend
+## Project layout
 
-## Run locally
+- `/` — Expo project entry (App.js, app.json)
+- `/backend` — FastAPI service
 
-### 1) Backend (FastAPI)
+## Run the mobile app
 
-From the repository root:
+```bash
+npm install
+npm start
+# press `w` for web, or scan the QR code with Expo Go
+```
+
+## Run the backend
 
 ```bash
 cd backend
@@ -24,28 +30,11 @@ pip install -r requirements-dev.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Health endpoint:
+Health endpoint: `GET http://127.0.0.1:8000/api/v1/health`
 
-- `GET http://127.0.0.1:8000/api/v1/health`
+## Make targets
 
-### 2) Frontend (Next.js)
-
-From the repository root:
-
-```bash
-cd frontend
-npm install
-NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
-```
-
-Open `http://127.0.0.1:3000`.
-
-## Validation commands
-
-From repo root:
-
-```bash
-make lint
-make build
-make test
-```
+- `make install-app` — install Expo dependencies
+- `make start` — start the Expo dev server
+- `make test` — run backend tests
+- `make install-backend` — set up backend virtualenv
