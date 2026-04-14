@@ -11,6 +11,9 @@ on:
       - "frontend/android/**"
       - ".github/workflows/build-apk.yml"
 
+permissions:
+  contents: read
+
 jobs:
   build-apk:
     if: ${{ hashFiles('frontend/android/gradlew') != '' }}
