@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+backend/.venv/
+
+# Local env files
+.env
+.env.*
+
+# Logs
+*.log
