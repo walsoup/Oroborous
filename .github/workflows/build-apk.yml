@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   build-apk:
-    if: ${{ hashFiles('frontend/android/gradlew') != '' }}
     runs-on: ubuntu-latest
     defaults:
       run:
