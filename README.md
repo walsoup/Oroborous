@@ -14,8 +14,10 @@ Full-stack starter stack using:
 
 ### 1) Backend (FastAPI)
 
+From the repository root:
+
 ```bash
-cd /home/runner/work/Oroborous/Oroborous/backend
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
@@ -28,8 +30,10 @@ Health endpoint:
 
 ### 2) Frontend (Next.js)
 
+From the repository root:
+
 ```bash
-cd /home/runner/work/Oroborous/Oroborous/frontend
+cd frontend
 npm install
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 ```
@@ -38,7 +42,7 @@ Open `http://127.0.0.1:3000`.
 
 ## Validation commands
 
-From repo root (`/home/runner/work/Oroborous/Oroborous`):
+From repo root:
 
 ```bash
 make lint
