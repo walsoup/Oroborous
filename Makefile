@@ -1,16 +1,17 @@
+.RECIPEPREFIX := >
 .PHONY: install-frontend install-backend lint build test
 
 install-frontend:
-cd frontend && npm install
+> cd frontend && npm install
 
 install-backend:
-cd backend && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements-dev.txt
+> cd backend && python3 -m venv .venv && ./.venv/bin/pip install -r requirements-dev.txt
 
 lint:
-cd frontend && npm run lint
+> cd frontend && npm run lint
 
 build:
-cd frontend && npm run build
+> cd frontend && npm run build
 
 test:
-cd backend && python3 -m pytest -q
+> cd backend && . .venv/bin/activate && python -m pytest -q
