@@ -31,6 +31,9 @@ jobs:
       - name: Build Next.js export
         run: npm run build
 
+      - name: Force install Capacitor CLI
+        run: npm install @capacitor/cli @capacitor/core
+
       - name: Sync Capacitor Android
         run: npx cap sync android
 
@@ -39,7 +42,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-          # cache: gradle is intentionally removed here so it stops crying about missing files
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -48,12 +50,13 @@ jobs:
         working-directory: frontend/android
         run: chmod +x ./gradlew
 
-      - name: Build release APK
+      - name: Build debug APK
         working-directory: frontend/android
-        run: ./gradlew --no-daemon assembleRelease
+        run: ./gradlew --no-daemon assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: frontend/android/app/build/outputs/apk/release/*.apk
+          path: frontend/android/app/build/outputs/apk/debug/*.apk
+          
