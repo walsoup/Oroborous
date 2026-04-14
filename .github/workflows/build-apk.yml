@@ -31,8 +31,11 @@ jobs:
       - name: Build Next.js export
         run: npm run build
 
-      - name: Force install Capacitor CLI
-        run: npm install @capacitor/cli @capacitor/core
+      - name: Force install Capacitor dependencies
+        run: npm install @capacitor/cli @capacitor/core @capacitor/android
+
+      - name: Add Android Platform
+        run: npx cap add android
 
       - name: Sync Capacitor Android
         run: npx cap sync android
