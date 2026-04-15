@@ -1,10 +1,15 @@
-name: Build Android APK (Capacitor Hybrid)
+name: Build Android APK (Expo)
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - "frontend/**"
+      - "App.js"
+      - "app.json"
+      - "package.json"
+      - "package-lock.json"
+      - "assets/**"
+      - ".github/workflows/build-apk.yml"
 
 permissions:
   contents: read
@@ -12,9 +17,6 @@ permissions:
 jobs:
   build-android-apk:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - name: Checkout repository
@@ -25,7 +27,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -33,28 +35,31 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          cache: true
+
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
-      - name: Build Next.js Web Assets
-        run: npm run build
+      - name: Generate native Android project
+        env:
+          EXPO_NO_TELEMETRY: 1
+          CI: true
+        run: npx expo prebuild --platform android --non-interactive
 
-      - name: Generate Native Android Code (Capacitor)
-        run: |
-          npm install @capacitor/cli @capacitor/core @capacitor/android
-          npx cap add android || true
-          npx cap sync android
-
-      - name: Build Standalone APK (Debug)
+      - name: Build Android APK (debug)
         run: |
           cd android
           chmod +x gradlew
-          export NODE_BINARY=$(which node)
           ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nextjs-capacitor-apk
-          path: frontend/android/app/build/outputs/apk/debug/*.apk
+          name: oroborous-android-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           
