@@ -1,70 +1,90 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GlassContainer from '../components/GlassContainer';
+import FadeIn from '../components/FadeIn';
 
 export default function SettingsScreen() {
   const [provider, setProvider] = useState('Claude');
   const [apiUrl, setApiUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [isVibeModeEnabled, setIsVibeModeEnabled] = useState(true);
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.sectionTitle}>AI Provider</Text>
+      <FadeIn delay={0}>
+        <Text style={styles.sectionTitle}>AI Integration Engine</Text>
+      </FadeIn>
 
-      <View style={styles.providerOptions}>
-        {['Claude', 'Gemini', 'Copilot', 'Custom'].map(p => (
-          <TouchableOpacity
-            key={p}
-            style={[styles.providerButton, provider === p && styles.activeProvider]}
-            onPress={() => setProvider(p)}
-          >
-            <Text style={[styles.providerText, provider === p && styles.activeProviderText]}>{p}</Text>
+      <FadeIn delay={100}>
+        <View style={styles.providerOptions}>
+          {['Claude', 'Gemini', 'Copilot', 'Custom'].map(p => (
+            <TouchableOpacity
+              key={p}
+              style={[styles.providerButton, provider === p && styles.activeProvider]}
+              onPress={() => setProvider(p)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.providerText, provider === p && styles.activeProviderText]}>{p}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </FadeIn>
+
+      <FadeIn delay={200}>
+        <GlassContainer style={styles.formContainer}>
+          <Text style={styles.formTitle}>
+            {provider === 'Custom' ? 'OpenAI-Compatible Endpoint' : `${provider} Native Connection`}
+          </Text>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>BASE URL</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="https://api.openai.com/v1"
+              placeholderTextColor="#64748b"
+              value={apiUrl}
+              onChangeText={setApiUrl}
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>API KEY</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="sk-..."
+              placeholderTextColor="#64748b"
+              value={apiKey}
+              onChangeText={setApiKey}
+              secureTextEntry
+              autoCapitalize="none"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.saveButton} activeOpacity={0.8}>
+            <Text style={styles.saveButtonText}>Initialize Connection</Text>
           </TouchableOpacity>
-        ))}
-      </View>
+        </GlassContainer>
+      </FadeIn>
 
-      <GlassContainer style={styles.formContainer}>
-        <Text style={styles.formTitle}>
-          {provider === 'Custom' ? 'Custom OpenAI-Compatible API' : `${provider} Settings`}
-        </Text>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Base URL</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="https://api.openai.com/v1"
-            placeholderTextColor="#64748b"
-            value={apiUrl}
-            onChangeText={setApiUrl}
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>API Key</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="sk-..."
-            placeholderTextColor="#64748b"
-            value={apiKey}
-            onChangeText={setApiKey}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-        </View>
-
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Save Settings</Text>
-        </TouchableOpacity>
-      </GlassContainer>
-
-      <View style={styles.infoSection}>
-        <Ionicons name="information-circle-outline" size={20} color="#94a3b8" />
-        <Text style={styles.infoText}>
-          Use any OpenAI-compatible API by selecting 'Custom' and entering your endpoint and key.
-        </Text>
-      </View>
+      <FadeIn delay={300}>
+        <GlassContainer style={styles.preferencesContainer}>
+          <Text style={styles.formTitle}>IDE Preferences</Text>
+          <View style={styles.prefRow}>
+            <View>
+              <Text style={styles.prefTitle}>Vibe Mode</Text>
+              <Text style={styles.prefDesc}>Allow Agent to autonomously stage commits</Text>
+            </View>
+            <Switch
+              value={isVibeModeEnabled}
+              onValueChange={setIsVibeModeEnabled}
+              trackColor={{ false: '#1e293b', true: '#00e1ff' }}
+              thumbColor={'#ffffff'}
+            />
+          </View>
+        </GlassContainer>
+      </FadeIn>
     </ScrollView>
   );
 }
@@ -72,14 +92,16 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#050B14',
     padding: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#e2e8f0',
+    fontWeight: '800',
+    color: '#ffffff',
     marginBottom: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   providerOptions: {
     flexDirection: 'row',
@@ -88,75 +110,89 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   providerButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   activeProvider: {
-    backgroundColor: 'rgba(34, 211, 238, 0.1)',
-    borderColor: '#22d3ee',
+    backgroundColor: 'rgba(0, 225, 255, 0.15)',
+    borderColor: '#00e1ff',
   },
   providerText: {
     color: '#94a3b8',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   activeProviderText: {
-    color: '#22d3ee',
+    color: '#00e1ff',
   },
   formContainer: {
-    padding: 20,
     marginBottom: 24,
   },
+  preferencesContainer: {
+    marginBottom: 40,
+  },
   formTitle: {
-    color: '#e2e8f0',
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 20,
+    fontWeight: '700',
+    marginBottom: 24,
+    letterSpacing: 0.5,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
-    color: '#cbd5e1',
-    fontSize: 14,
+    color: '#64748b',
+    fontSize: 12,
+    fontWeight: '800',
     marginBottom: 8,
+    letterSpacing: 1,
   },
   input: {
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    color: '#e2e8f0',
+    paddingVertical: 14,
+    color: '#ffffff',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    fontSize: 15,
   },
   saveButton: {
-    backgroundColor: '#22d3ee',
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: '#00e1ff',
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
+    shadowColor: '#00e1ff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   saveButtonText: {
-    color: '#0f172a',
-    fontWeight: '700',
-    fontSize: 16,
+    color: '#050B14',
+    fontWeight: '800',
+    fontSize: 15,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-  infoSection: {
+  prefRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    padding: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderRadius: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  infoText: {
-    color: '#94a3b8',
-    fontSize: 14,
-    lineHeight: 20,
-    flex: 1,
+  prefTitle: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  prefDesc: {
+    color: '#64748b',
+    fontSize: 13,
   },
 });
