@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 backend/.venv/
+server/config.json
+workspaces/
+server/workspaces/
 
 # Expo
 .expo/

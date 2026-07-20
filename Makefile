@@ -5,7 +5,7 @@ install-app:
 > npm install
 
 install-backend:
-> cd backend && python3 -m venv .venv && ./.venv/bin/pip install -r requirements-dev.txt
+> cd server && npm install
 
 lint:
 > npm run lint --if-present
@@ -14,7 +14,7 @@ build:
 > npx expo export --platform web
 
 test:
-> cd backend && . .venv/bin/activate && python -m pytest -q
+> echo "No backend tests configured yet"
 
 start:
-> npm start
+> node server/index.js & npm start
