@@ -63,7 +63,7 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.buttonsContainer}>
             <FadeIn delay={400}>
-              <TouchableOpacity onPress={() => handleLogin('Claude')} activeOpacity={0.8}>
+              <TouchableOpacity onPress={() => handleLogin('Claude')} activeOpacity={0.8} accessibilityLabel="continue-claude">
                 <LinearGradient
                   colors={['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}

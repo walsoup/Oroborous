@@ -14,7 +14,7 @@ on:
       - ".github/workflows/build-apk.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-android-apk:
@@ -69,4 +69,22 @@ jobs:
           path: |
             android/app/build/outputs/apk/release/app-release.apk
             android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Install Puppeteer in temp directory
+        run: |
+          mkdir -p /tmp/puppeteer
+          cd /tmp/puppeteer
+          npm init -y
+          npm install puppeteer
+
+      - name: Generate UI screenshots
+        run: node capture-screenshots.js
+
+      - name: Commit and push screenshots
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/screenshots/
+          git commit -m "chore: update UI screenshots [skip ci]" || echo "No changes to commit"
+          git push || echo "Failed to push screenshots"
           

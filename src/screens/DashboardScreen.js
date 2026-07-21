@@ -173,6 +173,7 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => handleActivateWorkspace(item.id)} 
           activeOpacity={0.8}
           style={styles.cardTouch}
+          accessibilityLabel="workspace-card"
         >
           <GlassContainer style={[styles.workspaceCard, isActive && styles.activeCardBorder]} intensity={isActive ? 60 : 30}>
             <View style={styles.cardHeader}>
@@ -220,7 +221,7 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.subtitle}>Agentic IDE Dashboard</Text>
         </FadeIn>
         <FadeIn delay={50}>
-          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsBtn}>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsBtn} accessibilityLabel="settings">
             <Ionicons name="settings-outline" size={22} color="#e2e8f0" />
           </TouchableOpacity>
         </FadeIn>
