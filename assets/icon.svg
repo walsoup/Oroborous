@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB7B2" /> <!-- Pastel Pink -->
+      <stop offset="50%" stop-color="#E2F0CB" /> <!-- Pastel Green -->
+      <stop offset="100%" stop-color="#B5EAD7" /> <!-- Pastel Mint -->
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#000000" flood-opacity="0.1" />
+    </filter>
+  </defs>
+  
+  <rect width="1024" height="1024" fill="#F9F6F0" rx="256" /> <!-- Soft off-white background -->
+  
+  <g filter="url(#softShadow)">
+    <!-- Snake Body -->
+    <path d="M 512 212 
+             C 710 212, 812 350, 812 512 
+             C 812 674, 710 812, 512 812 
+             C 314 812, 212 674, 212 512 
+             C 212 380, 280 270, 400 230" 
+          fill="none" 
+          stroke="url(#bodyGradient)" 
+          stroke-width="120" 
+          stroke-linecap="round" />
+          
+    <!-- Snake Head -->
+    <circle cx="430" cy="220" r="80" fill="#FFB7B2" />
+    
+    <!-- Eye -->
+    <circle cx="410" cy="200" r="15" fill="#6B5B95" />
+    
+    <!-- Blush -->
+    <circle cx="450" cy="240" r="18" fill="#FF9AA2" opacity="0.6" />
+    
+    <!-- Tail (being eaten) -->
+    <path d="M 480 220 L 520 200 L 520 240 Z" fill="#B5EAD7" />
+  </g>
+</svg>
