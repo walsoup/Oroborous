@@ -11,7 +11,13 @@ lint:
 > npm run lint --if-present
 
 build:
-> npx expo export --platform web
+> export ANDROID_HOME=$${ANDROID_HOME:-/data/data/com.termux/files/home/android-sdk} && \
+  if [ -d "/data/data/com.termux/files/usr/lib/jvm/java-17-openjdk" ]; then \
+    export JAVA_HOME=/data/data/com.termux/files/usr/lib/jvm/java-17-openjdk; \
+  fi && \
+  node node_modules/expo/bin/cli prebuild --platform android && \
+  cd android && ./gradlew assembleDebug && \
+  cp app/build/outputs/apk/debug/app-debug.apk ../
 
 test:
 > echo "No backend tests configured yet"
