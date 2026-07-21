@@ -8,6 +8,7 @@ on:
       - "app.json"
       - "package.json"
       - "package-lock.json"
+      - "babel.config.js"
       - "src/**"
       - "assets/**"
       - ".github/workflows/build-apk.yml"
