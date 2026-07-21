@@ -6,6 +6,9 @@ import FadeIn from '../components/FadeIn';
 import { LinearGradient } from 'expo-linear-gradient';
 import { api } from '../services/api';
 import { runAgentTask, getActiveAgents } from '../services/agent';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import BouncyButton from '../components/BouncyButton';
 
 export default function WorkspaceScreen({ route, navigation }) {
   const workspace = route.params?.workspace;
@@ -13,6 +16,25 @@ export default function WorkspaceScreen({ route, navigation }) {
   const workspacePath = workspace?.path;
 
   const [activeTab, setActiveTab] = useState('git'); // 'git', 'terminal', or 'agent'
+  const [containerWidth, setContainerWidth] = useState(0);
+  const tabWidth = containerWidth ? (containerWidth - 24) / 3 : 0;
+  const activeTabValue = useSharedValue(0);
+
+  useEffect(() => {
+    const index = activeTab === 'git' ? 0 : activeTab === 'terminal' ? 1 : 2;
+    activeTabValue.value = withSpring(index, { damping: 18, stiffness: 150 });
+  }, [activeTab]);
+
+  const animatedIndicatorStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: activeTabValue.value * tabWidth + 12
+        }
+      ],
+      width: tabWidth,
+    };
+  });
   const [gitStatus, setGitStatus] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileDiff, setFileDiff] = useState('');
@@ -564,24 +586,42 @@ export default function WorkspaceScreen({ route, navigation }) {
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabContainer}>
+      <View 
+        style={styles.tabContainer}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+      >
+        {tabWidth > 0 && (
+          <Animated.View style={[styles.activeIndicatorLine, animatedIndicatorStyle]} />
+        )}
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'git' && styles.activeTab]}
-          onPress={() => setActiveTab('git')}
+          style={styles.tab}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setActiveTab('git');
+          }}
+          accessibilityLabel="tab-git"
         >
           <Ionicons name="git-compare-outline" size={20} color={activeTab === 'git' ? '#00e1ff' : '#64748b'} />
           <Text style={[styles.tabText, activeTab === 'git' && styles.activeTabText]}>Git & Diffs</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'terminal' && styles.activeTab]}
-          onPress={() => setActiveTab('terminal')}
+          style={styles.tab}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setActiveTab('terminal');
+          }}
+          accessibilityLabel="tab-terminal"
         >
           <Ionicons name="terminal-outline" size={20} color={activeTab === 'terminal' ? '#00e1ff' : '#64748b'} />
           <Text style={[styles.tabText, activeTab === 'terminal' && styles.activeTabText]}>Terminal</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'agent' && styles.activeTab]}
-          onPress={() => setActiveTab('agent')}
+          style={styles.tab}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setActiveTab('agent');
+          }}
+          accessibilityLabel="tab-agent"
         >
           <Ionicons name="sparkles-outline" size={20} color={activeTab === 'agent' ? '#00e1ff' : '#64748b'} />
           <Text style={[styles.tabText, activeTab === 'agent' && styles.activeTabText]}>AI Agent</Text>
@@ -778,32 +818,35 @@ export default function WorkspaceScreen({ route, navigation }) {
               autoCorrect={false}
             />
             <View style={styles.commitActionsRow}>
-              <TouchableOpacity 
+              <BouncyButton 
                 style={[styles.gitActionBtn, { backgroundColor: 'rgba(255, 255, 255, 0.05)' }]} 
                 onPress={handleStageAll}
                 disabled={gitExecuting}
+                hapticType="light"
               >
                 <Ionicons name="add-circle-outline" size={16} color="#e2e8f0" />
                 <Text style={styles.gitActionBtnText}>Stage All</Text>
-              </TouchableOpacity>
+              </BouncyButton>
 
-              <TouchableOpacity 
+              <BouncyButton 
                 style={[styles.gitActionBtn, { backgroundColor: '#00e1ff' }]} 
                 onPress={handleCommit}
                 disabled={gitExecuting || !commitMsg.trim()}
+                hapticType="medium"
               >
                 <Ionicons name="git-commit-outline" size={16} color="#050B14" />
                 <Text style={[styles.gitActionBtnText, { color: '#050B14' }]}>Commit</Text>
-              </TouchableOpacity>
+              </BouncyButton>
 
-              <TouchableOpacity 
+              <BouncyButton 
                 style={[styles.gitActionBtn, { backgroundColor: '#c084fc' }]} 
                 onPress={handlePush}
                 disabled={gitExecuting}
+                hapticType="medium"
               >
                 <Ionicons name="cloud-upload-outline" size={16} color="#050B14" />
                 <Text style={[styles.gitActionBtnText, { color: '#050B14' }]}>Push</Text>
-              </TouchableOpacity>
+              </BouncyButton>
 
               {gitExecuting && (
                 <ActivityIndicator size="small" color="#00e1ff" style={{ marginLeft: 8 }} />
@@ -875,13 +918,14 @@ export default function WorkspaceScreen({ route, navigation }) {
               autoCorrect={false}
               disabled={runningCmd}
             />
-            <TouchableOpacity 
+            <BouncyButton 
               style={styles.sendButton} 
               onPress={() => handleRunCommand()}
               disabled={runningCmd || !terminalInput.trim()}
+              hapticType="medium"
             >
               <Ionicons name="play" size={18} color="#050B14" />
-            </TouchableOpacity>
+            </BouncyButton>
           </GlassContainer>
         </View>
       ) : (
@@ -1025,13 +1069,14 @@ export default function WorkspaceScreen({ route, navigation }) {
               autoCorrect={false}
               disabled={agentRunning}
             />
-            <TouchableOpacity 
+            <BouncyButton 
               style={styles.sendButton} 
               onPress={handleSendAgentTask}
               disabled={agentRunning || !agentPrompt.trim()}
+              hapticType="medium"
             >
               <Ionicons name="arrow-up" size={18} color="#050B14" />
-            </TouchableOpacity>
+            </BouncyButton>
           </GlassContainer>
         </View>
       )}
@@ -1141,6 +1186,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  activeIndicatorLine: {
+    position: 'absolute',
+    bottom: 0,
+    height: 3,
+    backgroundColor: '#00e1ff',
+    borderRadius: 1.5,
   },
   tab: {
     flex: 1,

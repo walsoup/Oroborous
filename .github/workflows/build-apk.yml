@@ -11,6 +11,7 @@ on:
       - "babel.config.js"
       - "src/**"
       - "assets/**"
+      - "scripts/**"
       - ".github/workflows/build-apk.yml"
 
 permissions:
@@ -23,13 +24,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Free disk space
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,9 +38,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install dependencies
         run: npm ci
 
@@ -54,28 +45,43 @@ jobs:
         env:
           EXPO_NO_TELEMETRY: 1
           CI: true
-        run: npx expo prebuild --platform android --non-interactive
+        run: |
+          npx expo prebuild --platform android --non-interactive
+          node scripts/optimize-android.js
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: android
 
       - name: Build Android APK (release)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --stacktrace
+          ./gradlew assembleRelease --stacktrace --build-cache --parallel
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: oroborous-android-apk
+          path: android/app/build/outputs/apk/release/*.apk
+
+      - name: Cache Puppeteer Browser
+        uses: actions/cache@v4
+        with:
           path: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            ~/.cache/puppeteer
+            /tmp/puppeteer
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('package-lock.json', 'capture-screenshots.js') }}
 
       - name: Install Puppeteer in temp directory
         run: |
-          mkdir -p /tmp/puppeteer
-          cd /tmp/puppeteer
-          npm init -y
-          npm install puppeteer
+          if [ ! -d "/tmp/puppeteer/node_modules/puppeteer" ]; then
+            mkdir -p /tmp/puppeteer
+            cd /tmp/puppeteer
+            npm init -y
+            npm install puppeteer
+          fi
 
       - name: Generate UI screenshots
         run: node capture-screenshots.js
