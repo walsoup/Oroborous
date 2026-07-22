@@ -4,30 +4,21 @@ const path = require('path');
 const androidDir = path.join(__dirname, '..', 'android');
 const buildGradlePath = path.join(androidDir, 'app', 'build.gradle');
 const gradlePropertiesPath = path.join(androidDir, 'gradle.properties');
-const proguardRulesPath = path.join(androidDir, 'app', 'proguard-rules.pro');
 
-console.log('Optimizing Android configuration for minimal APK size and fast build times...');
+console.log('Applying safe performance optimizations for Android build...');
 
 // 1. Modify android/app/build.gradle
 if (fs.existsSync(buildGradlePath)) {
   let content = fs.readFileSync(buildGradlePath, 'utf8');
 
-  // Enable ProGuard / R8 minification & resource shrinking
-  content = content.replace(/def enableProguardInReleaseBuilds = false/g, 'def enableProguardInReleaseBuilds = true');
-  content = content.replace(/def enableShrinkResourcesInReleaseBuilds = false/g, 'def enableShrinkResourcesInReleaseBuilds = true');
+  // Keep ProGuard/R8 obfuscation disabled to guarantee 100% startup stability
+  content = content.replace(/def enableProguardInReleaseBuilds = true/g, 'def enableProguardInReleaseBuilds = false');
+  content = content.replace(/def enableShrinkResourcesInReleaseBuilds = true/g, 'def enableShrinkResourcesInReleaseBuilds = false');
 
-  // Enable ABI splits
+  // Enable ABI splits for smaller architecture-specific APKs
   content = content.replace(/def enableSeparateBuildPerCPU = false/g, 'def enableSeparateBuildPerCPU = true');
 
-  // Strip NDK debug symbols from native binaries in release builds
-  if (!content.includes("debugSymbolLevel 'NONE'")) {
-    content = content.replace(
-      /buildTypes\s*\{[\s\S]*?release\s*\{/,
-      "buildTypes {\n        release {\n            ndk {\n                debugSymbolLevel 'NONE'\n            }"
-    );
-  }
-
-  // Ensure universal APK is also created alongside split APKs
+  // Ensure universal APK is also generated alongside split APKs
   if (content.includes('splits {') && !content.includes('universalApk true')) {
     content = content.replace(/abi\s*\{/g, 'abi {\n            universalApk true');
   }
@@ -48,8 +39,7 @@ if (fs.existsSync(gradlePropertiesPath)) {
     'org.gradle.caching=true',
     'org.gradle.configureondemand=true',
     'kotlin.incremental=true',
-    'android.enableR8.fullMode=true',
-    'reactNativeArchitectures=arm64-v8a'
+    'reactNativeArchitectures=armeabi-v7a,arm64-v8a,x86_64'
   ];
 
   optimizations.forEach(opt => {
@@ -67,26 +57,3 @@ if (fs.existsSync(gradlePropertiesPath)) {
 } else {
   console.warn('Warning: android/gradle.properties not found at ' + gradlePropertiesPath);
 }
-
-// 3. Update proguard-rules.pro
-const proguardRules = `
-# Proguard / R8 Optimization & Aggressive Code Shrinking Rules
--repackageclasses ''
--allowaccessmodification
--dontwarn **
-
--keep class com.facebook.react.** { *; }
--keep class com.facebook.hermes.** { *; }
--keep class expo.modules.** { *; }
-
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-`;
-
-if (fs.existsSync(proguardRulesPath)) {
-  fs.appendFileSync(proguardRulesPath, proguardRules, 'utf8');
-} else {
-  fs.writeFileSync(proguardRulesPath, proguardRules, 'utf8');
-}
-console.log('Successfully updated proguard-rules.pro');

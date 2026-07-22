@@ -2,7 +2,6 @@ package expo.modules.oroborousnative
 
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import expo.modules.kotlin.Promise
 import java.io.File
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -13,8 +12,9 @@ class OroborousNativeModule : Module() {
 
     AsyncFunction("executeCommand") { command: String, dir: String ->
       try {
+        val workDir = if (dir.isNotEmpty() && File(dir).exists()) File(dir) else File("/")
         val process = ProcessBuilder("/system/bin/sh", "-c", command)
-          .directory(File(dir))
+          .directory(workDir)
           .start()
 
         val stdoutReader = BufferedReader(InputStreamReader(process.inputStream))
@@ -38,7 +38,7 @@ class OroborousNativeModule : Module() {
           "stdout" to stdout.toString(),
           "stderr" to stderr.toString()
         )
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         mapOf(
           "code" to -1,
           "stdout" to "",
@@ -51,24 +51,20 @@ class OroborousNativeModule : Module() {
       try {
         val dirFile = File(dir)
         if (!dirFile.exists() || !dirFile.isDirectory) {
-          return@AsyncFunction mapOf("isGit" to false, "error" to "Directory does not exist or is not a directory")
+          return@AsyncFunction mapOf("isGit" to false, "error" to "Directory does not exist")
         }
 
-        // Check if is git repo
         val isGitRes = runCommand("git rev-parse --is-inside-work-tree", dir)
         if (isGitRes.first != 0) {
           return@AsyncFunction mapOf("isGit" to false, "message" to "Not a git repository")
         }
 
-        // Branch name
         val branchRes = runCommand("git rev-parse --abbrev-ref HEAD", dir)
         val branch = branchRes.second.trim()
 
-        // Short status
         val statusRes = runCommand("git status --short", dir)
         val statusShort = statusRes.second
 
-        // Commits ahead/behind
         var ahead = 0
         var behind = 0
         val upstreamRes = runCommand("git rev-parse --abbrev-ref @{u}", dir)
@@ -92,7 +88,7 @@ class OroborousNativeModule : Module() {
           "statusShort" to statusShort,
           "path" to dir
         )
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         mapOf(
           "isGit" to false,
           "error" to (e.message ?: "Unknown error")
@@ -107,7 +103,7 @@ class OroborousNativeModule : Module() {
         mapOf(
           "diff" to (if (res.second.isNotEmpty()) res.second else res.third)
         )
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         mapOf(
           "diff" to "Error generating diff: ${e.message}"
         )
@@ -125,7 +121,7 @@ class OroborousNativeModule : Module() {
           "absolutePath" to file.absolutePath,
           "name" to file.name
         )
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         mapOf(
           "exists" to false,
           "isDirectory" to false,
@@ -136,23 +132,27 @@ class OroborousNativeModule : Module() {
 
     AsyncFunction("readConfigFile") { fileName: String ->
       try {
-        val file = File(appContext.reactContext?.filesDir, fileName)
+        val targetDir = appContext.reactContext?.filesDir ?: appContext.filesDir
+        if (targetDir == null) return@AsyncFunction ""
+        val file = File(targetDir, fileName)
         if (file.exists()) {
           file.readText()
         } else {
           ""
         }
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         ""
       }
     }
 
     AsyncFunction("writeConfigFile") { fileName: String, content: String ->
       try {
-        val file = File(appContext.reactContext?.filesDir, fileName)
+        val targetDir = appContext.reactContext?.filesDir ?: appContext.filesDir
+        if (targetDir == null) return@AsyncFunction false
+        val file = File(targetDir, fileName)
         file.writeText(content)
         true
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         false
       }
     }
@@ -165,7 +165,7 @@ class OroborousNativeModule : Module() {
         } else {
           "Error: File not found or is not a file"
         }
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         "Error: ${e.message}"
       }
     }
@@ -179,7 +179,7 @@ class OroborousNativeModule : Module() {
         }
         file.writeText(content)
         true
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         false
       }
     }
@@ -187,6 +187,7 @@ class OroborousNativeModule : Module() {
     AsyncFunction("listFiles") { dir: String ->
       try {
         val dirFile = File(dir)
+        if (!dirFile.exists()) return@AsyncFunction emptyList<String>()
         val results = mutableListOf<String>()
         
         fun walk(current: File) {
@@ -204,32 +205,37 @@ class OroborousNativeModule : Module() {
         
         walk(dirFile)
         results
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         emptyList<String>()
       }
     }
   }
 
   private fun runCommand(cmd: String, dir: String): Triple<Int, String, String> {
-    val process = ProcessBuilder("/system/bin/sh", "-c", cmd)
-      .directory(File(dir))
-      .start()
+    return try {
+      val workDir = if (dir.isNotEmpty() && File(dir).exists()) File(dir) else File("/")
+      val process = ProcessBuilder("/system/bin/sh", "-c", cmd)
+        .directory(workDir)
+        .start()
 
-    val stdoutReader = BufferedReader(InputStreamReader(process.inputStream))
-    val stderrReader = BufferedReader(InputStreamReader(process.errorStream))
+      val stdoutReader = BufferedReader(InputStreamReader(process.inputStream))
+      val stderrReader = BufferedReader(InputStreamReader(process.errorStream))
 
-    val stdout = StringBuilder()
-    var line: String?
-    while (stdoutReader.readLine().also { line = it } != null) {
-      stdout.append(line).append("\n")
+      val stdout = StringBuilder()
+      var line: String?
+      while (stdoutReader.readLine().also { line = it } != null) {
+        stdout.append(line).append("\n")
+      }
+
+      val stderr = StringBuilder()
+      while (stderrReader.readLine().also { line = it } != null) {
+        stderr.append(line).append("\n")
+      }
+
+      val exitCode = process.waitFor()
+      Triple(exitCode, stdout.toString(), stderr.toString())
+    } catch (e: Throwable) {
+      Triple(-1, "", e.message ?: "Error executing command")
     }
-
-    val stderr = StringBuilder()
-    while (stderrReader.readLine().also { line = it } != null) {
-      stderr.append(line).append("\n")
-    }
-
-    val exitCode = process.waitFor()
-    return Triple(exitCode, stdout.toString(), stderr.toString())
   }
 }
