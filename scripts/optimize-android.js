@@ -19,6 +19,14 @@ if (fs.existsSync(buildGradlePath)) {
   // Enable ABI splits
   content = content.replace(/def enableSeparateBuildPerCPU = false/g, 'def enableSeparateBuildPerCPU = true');
 
+  // Strip NDK debug symbols from native binaries in release builds
+  if (!content.includes("debugSymbolLevel 'NONE'")) {
+    content = content.replace(
+      /buildTypes\s*\{[\s\S]*?release\s*\{/,
+      "buildTypes {\n        release {\n            ndk {\n                debugSymbolLevel 'NONE'\n            }"
+    );
+  }
+
   // Ensure universal APK is also created alongside split APKs
   if (content.includes('splits {') && !content.includes('universalApk true')) {
     content = content.replace(/abi\s*\{/g, 'abi {\n            universalApk true');
@@ -41,7 +49,7 @@ if (fs.existsSync(gradlePropertiesPath)) {
     'org.gradle.configureondemand=true',
     'kotlin.incremental=true',
     'android.enableR8.fullMode=true',
-    'reactNativeArchitectures=arm64-v8a,armeabi-v7a'
+    'reactNativeArchitectures=arm64-v8a'
   ];
 
   optimizations.forEach(opt => {
@@ -62,13 +70,14 @@ if (fs.existsSync(gradlePropertiesPath)) {
 
 // 3. Update proguard-rules.pro
 const proguardRules = `
-# Proguard / R8 Optimization Rules
+# Proguard / R8 Optimization & Aggressive Code Shrinking Rules
+-repackageclasses ''
+-allowaccessmodification
+-dontwarn **
+
 -keep class com.facebook.react.** { *; }
 -keep class com.facebook.hermes.** { *; }
--dontwarn com.facebook.react.**
-
 -keep class expo.modules.** { *; }
--dontwarn expo.modules.**
 
 -keepclasseswithmembernames class * {
     native <methods>;
