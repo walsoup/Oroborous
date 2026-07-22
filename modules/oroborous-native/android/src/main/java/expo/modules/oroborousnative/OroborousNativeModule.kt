@@ -132,7 +132,7 @@ class OroborousNativeModule : Module() {
 
     AsyncFunction("readConfigFile") { fileName: String ->
       try {
-        val targetDir = appContext.reactContext?.filesDir ?: appContext.filesDir
+        val targetDir = appContext.reactContext?.filesDir ?: appContext.reactContext?.applicationContext?.filesDir
         if (targetDir == null) return@AsyncFunction ""
         val file = File(targetDir, fileName)
         if (file.exists()) {
@@ -147,7 +147,7 @@ class OroborousNativeModule : Module() {
 
     AsyncFunction("writeConfigFile") { fileName: String, content: String ->
       try {
-        val targetDir = appContext.reactContext?.filesDir ?: appContext.filesDir
+        val targetDir = appContext.reactContext?.filesDir ?: appContext.reactContext?.applicationContext?.filesDir
         if (targetDir == null) return@AsyncFunction false
         val file = File(targetDir, fileName)
         file.writeText(content)
