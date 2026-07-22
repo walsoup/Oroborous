@@ -256,6 +256,24 @@ export default function SettingsScreen() {
         </GlassContainer>
       </FadeIn>
 
+      <FadeIn delay={275}>
+        <GlassContainer style={styles.preferencesContainer} intensity={30}>
+          <Text style={styles.formTitle}>About Oroborous</Text>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>VERSION</Text>
+            <Text style={styles.aboutValue}>v1.1 Stable Dev Release</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>DEVELOPER</Text>
+            <Text style={styles.aboutValue}>itswal</Text>
+          </View>
+          <View style={styles.aboutRow}>
+            <Text style={styles.aboutLabel}>CONTACT</Text>
+            <Text style={styles.aboutValue}>me@itswal.me</Text>
+          </View>
+        </GlassContainer>
+      </FadeIn>
+
       <FadeIn delay={300} style={{ marginBottom: 40 }}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveSettings} disabled={saving} activeOpacity={0.8}>
           {saving ? (
@@ -408,5 +426,24 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontSize: 12,
     lineHeight: 16,
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  aboutLabel: {
+    color: '#64748b',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  aboutValue: {
+    color: '#00e1ff',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

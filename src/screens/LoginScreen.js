@@ -58,6 +58,7 @@ export default function LoginScreen({ navigation }) {
 
           <FadeIn delay={300}>
             <Text style={styles.subtitle}>The Most Advanced Mobile Agentic IDE.</Text>
+            <Text style={styles.versionBadge}>v1.1 Stable Dev Release • by itswal</Text>
             <View style={styles.divider} />
           </FadeIn>
 
@@ -142,10 +143,19 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#94a3b8',
-    marginBottom: 16,
+    marginBottom: 6,
     textAlign: 'center',
     fontWeight: '500',
     lineHeight: 24,
+  },
+  versionBadge: {
+    fontSize: 12,
+    color: '#00e1ff',
+    marginBottom: 16,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    opacity: 0.9,
   },
   divider: {
     width: 40,

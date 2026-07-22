@@ -1,6 +1,8 @@
-# 🐍 Oroborous
+# 🐍 Oroborous `v1.1` (Stable Dev Release)
 
 > **The Mobile-First Agentic IDE.** Vibe code anywhere, right from your phone.
+>
+> **Developer:** [itswal](https://github.com/walsoup) • **Contact:** [me@itswal.me](mailto:me@itswal.me)
 
 Oroborous is a premium, mobile-first agentic IDE designed for developers who want to manage repositories, run terminal commands, and collaborate with autonomous coding agents directly on their mobile devices. 
 

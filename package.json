@@ -1,7 +1,8 @@
 {
   "name": "oroborous",
   "description": "Expo-powered mobile app for the Oroborous project",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "author": "itswal <me@itswal.me>",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
