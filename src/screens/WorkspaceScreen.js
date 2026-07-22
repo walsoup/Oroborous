@@ -18,7 +18,12 @@ export default function WorkspaceScreen({ route, navigation }) {
   const [activeTab, setActiveTab] = useState('git'); // 'git', 'terminal', or 'agent'
   const [containerWidth, setContainerWidth] = useState(0);
   const tabWidth = containerWidth ? (containerWidth - 24) / 3 : 0;
+  const tabWidthValue = useSharedValue(0);
   const activeTabValue = useSharedValue(0);
+
+  useEffect(() => {
+    tabWidthValue.value = tabWidth;
+  }, [tabWidth]);
 
   useEffect(() => {
     const index = activeTab === 'git' ? 0 : activeTab === 'terminal' ? 1 : 2;
@@ -29,10 +34,10 @@ export default function WorkspaceScreen({ route, navigation }) {
     return {
       transform: [
         {
-          translateX: activeTabValue.value * tabWidth + 12
+          translateX: activeTabValue.value * tabWidthValue.value + 12
         }
       ],
-      width: tabWidth,
+      width: tabWidthValue.value,
     };
   });
   const [gitStatus, setGitStatus] = useState(null);

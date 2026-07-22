@@ -29,7 +29,7 @@ const loadLocalConfig = async () => {
   if (!OroborousNative) return;
   try {
     const content = await OroborousNative.readConfigFile('oroborous-config.json');
-    if (content) {
+    if (content && typeof content === 'string') {
       localConfig = JSON.parse(content);
     }
   } catch (e) {
@@ -222,10 +222,11 @@ export const api = {
       const activeWs = localConfig.workspaces.find(w => w.id === localConfig.activeWorkspaceId);
       if (!activeWs) throw new Error('No active workspace selected');
       const content = await OroborousNative.readFileContent(activeWs.path, file);
-      if (content.startsWith('Error:')) {
-        throw new Error(content);
+      const safeContent = (typeof content === 'string') ? content : '';
+      if (safeContent.startsWith('Error:')) {
+        throw new Error(safeContent);
       }
-      return { content };
+      return { content: safeContent };
     }
     return request(`/api/files?file=${encodeURIComponent(file)}`);
   },
@@ -251,7 +252,7 @@ export const api = {
       const activeWs = localConfig.workspaces.find(w => w.id === localConfig.activeWorkspaceId);
       if (!activeWs) throw new Error('No active workspace selected');
       const files = await OroborousNative.listFiles(activeWs.path);
-      return { files };
+      return { files: Array.isArray(files) ? files : [] };
     }
     return request('/api/files/list');
   },
