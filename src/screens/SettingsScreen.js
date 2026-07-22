@@ -5,7 +5,7 @@ import GlassContainer from '../components/GlassContainer';
 import FadeIn from '../components/FadeIn';
 import { api, getServerUrl, setServerUrl } from '../services/api';
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const [provider, setProvider] = useState('ollama');
   const [baseUrl, setBaseUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -271,6 +271,14 @@ export default function SettingsScreen() {
             <Text style={styles.aboutLabel}>CONTACT</Text>
             <Text style={styles.aboutValue}>me@itswal.me</Text>
           </View>
+          <TouchableOpacity
+            style={styles.replayOnboardingBtn}
+            onPress={() => navigation.navigate('Onboarding')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="sparkles-outline" size={16} color="#00e1ff" />
+            <Text style={styles.replayOnboardingText}>Replay Onboarding Tour</Text>
+          </TouchableOpacity>
         </GlassContainer>
       </FadeIn>
 
@@ -445,5 +453,22 @@ const styles = StyleSheet.create({
     color: '#00e1ff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  replayOnboardingBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 225, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 225, 255, 0.2)',
+  },
+  replayOnboardingText: {
+    color: '#00e1ff',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });
