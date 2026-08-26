@@ -1,6 +1,6 @@
 {
   "name": "oroborous-native",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Native Kotlin module for Oroborous IDE",
   "author": "itswal <me@itswal.me>",
   "main": "src/index.ts",

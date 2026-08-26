@@ -29,12 +29,12 @@ export default class ErrorBoundary extends React.Component {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (_) {}
 
-    const subject = encodeURIComponent('Oroborous App Error Report (v1.1)');
+    const subject = encodeURIComponent('Oroborous App Error Report (v2.0)');
     const errorDetails = this.state.error ? this.state.error.toString() : 'Unknown Error';
     const stackDetails = this.state.errorInfo ? this.state.errorInfo.componentStack : '';
     
     const body = encodeURIComponent(
-      `Hi itswal,\n\nI encountered an error in Oroborous v1.1:\n\n` +
+      `Hi itswal,\n\nI encountered an error in Oroborous v2.0:\n\n` +
       `--- ERROR DETAILS ---\n${errorDetails}\n\n` +
       `--- COMPONENT STACK ---\n${stackDetails}\n\n` +
       `--- DEVICE ENVIRONMENT ---\n` +

@@ -99,4 +99,33 @@ jobs:
           git add assets/screenshots/
           git commit -m "chore: update UI screenshots [skip ci]" || echo "No changes to commit"
           git push || echo "Failed to push screenshots"
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.2
+          name: "Oroborous v1.2 (Stable Release)"
+          draft: false
+          prerelease: false
+          body: |
+            # 🐍 Oroborous v1.2 (Stable Release)
+            
+            **The Mobile-First Agentic IDE.** Vibe code anywhere, right from your phone.
+            
+            ### 🌟 Key Highlights in v1.2:
+            * 🤖 **Multi-Agent Engine**: Autonomous coding agents with dual JSON/XML tools, goal HUD plan tracking, and 1-tap time-travel rewind checkpoints.
+            * 📂 **Interactive Code Editor & Tree Explorer**: Live code editing with line numbers, search, syntax snippets, and hierarchical collapsible file tree.
+            * 🌿 **Git Command Center**: Side-by-side & unified syntax diffs, staging/unstaging, AI commit message generator, and branch switcher.
+            * ⚡ **Hyper-Terminal**: Interactive shell with ANSI formatting, mobile quick-keys bar (`ESC`, `TAB`, `CTRL-C`, `|`, `~`, `/`, `&&`, `$`), and command history.
+            * 🔒 **Security Hardened**: Localhost daemon binding, bearer pairing token auth, traversal-safe sandbox, and sanitized API key storage.
+            
+            ### 📦 Download Assets:
+            - `app-arm64-v8a-release.apk` (Recommended for modern Android phones - ~11MB)
+            - `app-universal-release.apk` (Universal architecture support)
+          files: |
+            android/app/build/outputs/apk/release/app-arm64-v8a-release.apk
+            android/app/build/outputs/apk/release/app-universal-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           

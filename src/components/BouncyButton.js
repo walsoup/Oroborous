@@ -9,14 +9,16 @@ export default function BouncyButton({ children, onPress, style, disabled, hapti
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scale.value }],
+      opacity: disabled ? 0.45 : 1,
     };
   });
 
   const onPressIn = () => {
     if (disabled) return;
-    scale.value = withSpring(0.94, { damping: 15, stiffness: 300 });
-    
-    // Trigger haptic feedback on press-in for instant tactile response
+    // Single ownership rule: this component owns press haptics.
+    // Handlers should only fire result-level notificationAsync (Success/Error).
+    scale.value = withSpring(0.94, { damping: 17, stiffness: 320 });
+
     if (Platform.OS !== 'web') {
       if (hapticType === 'light') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -29,7 +31,7 @@ export default function BouncyButton({ children, onPress, style, disabled, hapti
   };
 
   const onPressOut = () => {
-    scale.value = withSpring(1, { damping: 12, stiffness: 250 });
+    scale.value = withSpring(1, { damping: 14, stiffness: 260 });
   };
 
   return (
@@ -37,6 +39,8 @@ export default function BouncyButton({ children, onPress, style, disabled, hapti
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       onPress={disabled ? undefined : onPress}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
     >
       <Animated.View style={[style, animatedStyle]}>
         {children}

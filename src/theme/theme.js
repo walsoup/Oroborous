@@ -1,0 +1,87 @@
+import { Platform } from 'react-native';
+
+export const THEMES = {
+  cyberpunk: {
+    id: 'cyberpunk',
+    name: 'Cyberpunk Neon',
+    bg: '#050B14',
+    bgSecondary: '#0B192C',
+    surface: '#0F1E36',
+    surfaceGlass: 'rgba(15, 30, 54, 0.75)',
+    surfaceHighlight: 'rgba(0, 225, 255, 0.08)',
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderActive: '#00e1ff',
+    primary: '#00e1ff',
+    primaryGlow: 'rgba(0, 225, 255, 0.3)',
+    secondary: '#c084fc',
+    accent: '#38bdf8',
+    success: '#4ade80',
+    warning: '#f59e0b',
+    error: '#f87171',
+    text: '#ffffff',
+    textMuted: '#94a3b8',
+    textDim: '#64748b',
+    codeBg: '#020617',
+  },
+  obsidian: {
+    id: 'obsidian',
+    name: 'Obsidian OLED',
+    bg: '#000000',
+    bgSecondary: '#09090b',
+    surface: '#121214',
+    surfaceGlass: 'rgba(18, 18, 20, 0.85)',
+    surfaceHighlight: 'rgba(255, 255, 255, 0.06)',
+    border: 'rgba(255, 255, 255, 0.1)',
+    borderActive: '#ffffff',
+    primary: '#ffffff',
+    primaryGlow: 'rgba(255, 255, 255, 0.2)',
+    secondary: '#a1a1aa',
+    accent: '#38bdf8',
+    success: '#22c55e',
+    warning: '#eab308',
+    error: '#ef4444',
+    text: '#ffffff',
+    textMuted: '#a1a1aa',
+    textDim: '#52525b',
+    codeBg: '#050505',
+  },
+  tokyo: {
+    id: 'tokyo',
+    name: 'Tokyo Night',
+    bg: '#0a0f1d',
+    bgSecondary: '#111827',
+    surface: '#1e1e2e',
+    surfaceGlass: 'rgba(30, 30, 46, 0.8)',
+    surfaceHighlight: 'rgba(122, 162, 247, 0.1)',
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderActive: '#7aa2f7',
+    primary: '#7aa2f7',
+    primaryGlow: 'rgba(122, 162, 247, 0.3)',
+    secondary: '#bb9af7',
+    accent: '#7dcfff',
+    success: '#9ece6a',
+    warning: '#e0af68',
+    error: '#f7768e',
+    text: '#c0caf5',
+    textMuted: '#9aa5ce',
+    textDim: '#565f89',
+    codeBg: '#060a14',
+  }
+};
+
+export const SPRINGS = {
+  // Tab indicator & chevrons: ~5% overshoot — crisp without jelly
+  snappy: { damping: 24, stiffness: 320 },
+  bouncy: { damping: 14, stiffness: 220 },
+  gentle: { damping: 20, stiffness: 120 },
+  instant: { damping: 25, stiffness: 400 },
+  // Button press/release asymmetry: firm sink, lively return
+  press: { damping: 17, stiffness: 320 },
+  release: { damping: 14, stiffness: 260 },
+  enter: { damping: 16, stiffness: 170 },
+};
+
+export const FONTS = {
+  mono: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  sans: Platform.OS === 'ios' ? 'System' : 'normal',
+};

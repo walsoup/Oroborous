@@ -3,22 +3,30 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import GlassContainer from '../components/GlassContainer';
 import FadeIn from '../components/FadeIn';
+import BouncyButton from '../components/BouncyButton';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, useReducedMotion, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import { FONTS } from '../theme/theme';
 
 const { width, height } = Dimensions.get('window');
 
-// Background floating orbs
 const Orb = ({ color, size, top, left, delay }) => {
   const translateY = useSharedValue(0);
+  const reduceMotion = useReducedMotion();
 
   React.useEffect(() => {
+    // Under OS reduced-motion, orbs stay static at center instead of
+    // freezing at a withRepeat end-pose offset
+    if (reduceMotion) {
+      translateY.value = 0;
+      return;
+    }
     translateY.value = withRepeat(
-      withTiming(30, { duration: 3000 + delay, easing: Easing.inOut(Easing.ease) }),
+      withTiming(25, { duration: 3200 + delay, easing: Easing.inOut(Easing.ease) }),
       -1,
       true
     );
-  }, []);
+  }, [reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -36,70 +44,65 @@ const Orb = ({ color, size, top, left, delay }) => {
 };
 
 export default function LoginScreen({ navigation }) {
-  const handleLogin = (provider) => {
-    console.log(`Logging in with ${provider}`);
+  // Press haptics are owned by BouncyButton; handler stays silent
+  const handleLogin = (providerName) => {
     navigation.replace('Dashboard');
   };
 
   return (
     <View style={styles.container}>
-      {/* Deep dark gradient background */}
       <LinearGradient colors={['#050B14', '#0B192C', '#1E3E62']} style={StyleSheet.absoluteFill} />
 
-      {/* Ambient Orbs */}
-      <Orb color="rgba(34, 211, 238, 0.15)" size={200} top={height * 0.1} left={-50} delay={0} />
-      <Orb color="rgba(168, 85, 247, 0.15)" size={250} top={height * 0.6} left={width * 0.5} delay={1000} />
+      {/* Floating Ambient Glowing Orbs */}
+      <Orb color="rgba(0, 225, 255, 0.12)" size={220} top={height * 0.08} left={-40} delay={0} />
+      <Orb color="rgba(192, 132, 252, 0.12)" size={260} top={height * 0.6} left={width * 0.45} delay={800} />
 
-      <FadeIn delay={100} style={styles.content}>
-        <GlassContainer style={styles.glassPanel}>
-          <FadeIn delay={200}>
+      <FadeIn delay={80} style={styles.content}>
+        <GlassContainer style={styles.glassPanel} intensity={50}>
+          <FadeIn delay={120}>
+            <View style={styles.logoBadge}>
+              <Ionicons name="terminal" size={28} color="#00e1ff" />
+            </View>
             <Text style={styles.title}>Oroborous</Text>
-          </FadeIn>
-
-          <FadeIn delay={300}>
-            <Text style={styles.subtitle}>The Most Advanced Mobile Agentic IDE.</Text>
-            <Text style={styles.versionBadge}>v1.1 Stable Dev Release • by itswal</Text>
+            <Text style={styles.subtitle}>The Mobile-First Agentic IDE</Text>
+            <Text style={styles.versionBadge}>v1.2 Stable Release • by itswal</Text>
             <View style={styles.divider} />
           </FadeIn>
 
           <View style={styles.buttonsContainer}>
-            <FadeIn delay={400}>
-              <TouchableOpacity onPress={() => handleLogin('Claude')} activeOpacity={0.8} accessibilityLabel="continue-claude">
-                <LinearGradient
-                  colors={['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                  style={styles.button}
-                >
-                  <Ionicons name="sparkles" size={24} color="#00e1ff" />
-                  <Text style={styles.buttonText}>Continue with Claude</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+            <FadeIn delay={200}>
+              <BouncyButton
+                style={styles.button}
+                onPress={() => handleLogin('OpenRouter')}
+                accessibilityLabel="continue-claude"
+                hapticType="medium"
+              >
+                <Ionicons name="sparkles" size={20} color="#00e1ff" />
+                <Text style={styles.buttonText}>Continue with AI Agent</Text>
+              </BouncyButton>
             </FadeIn>
 
-            <FadeIn delay={500}>
-              <TouchableOpacity onPress={() => handleLogin('Google')} activeOpacity={0.8}>
-                <LinearGradient
-                  colors={['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                  style={styles.button}
-                >
-                  <Ionicons name="logo-google" size={24} color="#e2e8f0" />
-                  <Text style={styles.buttonText}>Continue with Google</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+            <FadeIn delay={280}>
+              <BouncyButton
+                style={styles.button}
+                onPress={() => handleLogin('GitHub')}
+                accessibilityLabel="continue-github"
+                hapticType="medium"
+              >
+                <Ionicons name="logo-github" size={20} color="#e2e8f0" />
+                <Text style={styles.buttonText}>Continue with GitHub</Text>
+              </BouncyButton>
             </FadeIn>
 
-            <FadeIn delay={600}>
-              <TouchableOpacity onPress={() => handleLogin('GitHub')} activeOpacity={0.8}>
-                <LinearGradient
-                  colors={['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                  style={styles.button}
-                >
-                  <Ionicons name="logo-github" size={24} color="#e2e8f0" />
-                  <Text style={styles.buttonText}>Continue with GitHub</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+            <FadeIn delay={360}>
+              <BouncyButton
+                style={[styles.button, styles.buttonSecondary]}
+                onPress={() => handleLogin('Offline')}
+                hapticType="light"
+              >
+                <Ionicons name="laptop-outline" size={20} color="#94a3b8" />
+                <Text style={[styles.buttonText, { color: '#94a3b8' }]}>Offline Local Workspace</Text>
+              </BouncyButton>
             </FadeIn>
           </View>
         </GlassContainer>
@@ -117,73 +120,84 @@ const styles = StyleSheet.create({
   },
   orb: {
     position: 'absolute',
-    filter: 'blur(40px)',
   },
   content: {
     width: '100%',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     alignItems: 'center',
     zIndex: 10,
   },
   glassPanel: {
     width: '100%',
-    maxWidth: 420,
+    maxWidth: 400,
     alignItems: 'center',
-    paddingVertical: 48,
-    paddingHorizontal: 24,
+    paddingVertical: 36,
+    paddingHorizontal: 20,
+  },
+  logoBadge: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(0, 225, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 225, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 14,
   },
   title: {
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: '900',
     color: '#ffffff',
-    marginBottom: 12,
     textAlign: 'center',
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#94a3b8',
-    marginBottom: 6,
-    textAlign: 'center',
-    fontWeight: '500',
-    lineHeight: 24,
-  },
-  versionBadge: {
-    fontSize: 12,
-    color: '#00e1ff',
-    marginBottom: 16,
+    marginTop: 4,
     textAlign: 'center',
     fontWeight: '600',
-    letterSpacing: 0.5,
-    opacity: 0.9,
+  },
+  versionBadge: {
+    fontSize: 11,
+    color: '#00e1ff',
+    marginTop: 6,
+    marginBottom: 14,
+    textAlign: 'center',
+    fontFamily: FONTS.mono,
   },
   divider: {
-    width: 40,
-    height: 4,
+    width: 36,
+    height: 3,
     backgroundColor: '#00e1ff',
     borderRadius: 2,
     alignSelf: 'center',
-    marginBottom: 40,
-    opacity: 0.8,
+    marginBottom: 28,
   },
   buttonsContainer: {
     width: '100%',
-    gap: 16,
+    gap: 12,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
-    borderRadius: 16,
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
+    gap: 10,
+  },
+  buttonSecondary: {
+    backgroundColor: 'transparent',
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 12,
-    letterSpacing: 0.5,
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
